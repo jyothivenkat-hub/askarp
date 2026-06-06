@@ -6,6 +6,16 @@ Askarp is an avatar-first prototype for building interactive personas from sourc
 
 The current demo is a Karpathy-inspired learning companion grounded in public Andrej Karpathy materials. It is not Andrej Karpathy, does not impersonate him, and should not be treated as speaking on his behalf.
 
+Askarp can be used for:
+
+- Learning companions based on public source material.
+- Expert-style personas for education or internal training.
+- Customer profiles for early concept testing.
+- Buyer personas for messaging exploration.
+- Research personas from interviews, notes, or surveys.
+- Critique personas for product, strategy, or positioning work.
+- Interactive synthesis from qualitative research material.
+
 [Live demo](https://askarp.vercel.app)
 
 <img src="assets/andrej-pixel-pet.png" alt="Askarp pixel avatar" width="180">
@@ -45,16 +55,6 @@ The first test persona is Askarp, a Karpathy-inspired technical learning compani
 It uses public source material to answer questions, explain ideas from first principles, and support different learning modes.
 
 This is a prototype and test version only.
-
-## Possible Use Cases
-
-- Learning companions based on public source material.
-- Expert-style personas for education or internal training.
-- Customer profiles for early concept testing.
-- Buyer personas for messaging exploration.
-- Research personas from interviews, notes, or surveys.
-- Critique personas for product, strategy, or positioning work.
-- Interactive synthesis from qualitative research material.
 
 ## What It Does Today
 
