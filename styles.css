@@ -546,6 +546,29 @@ h1 {
   line-height: 1.55;
 }
 
+.insight-body strong {
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.insight-body pre {
+  margin: 12px 0;
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid rgba(26, 46, 38, 0.14);
+  border-radius: 8px;
+  background: #101914;
+  color: #e5fff3;
+  padding: 14px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.insight-body code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
 .pet-wrap {
   align-self: end;
   width: min(520px, 100%);

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Askarp</title>
-    <link rel="stylesheet" href="styles.css?v=voice-insights-polish" />
+    <link rel="stylesheet" href="styles.css?v=mode-behaviors" />
   </head>
   <body>
     <main class="app-shell" data-state="idle">
@@ -18,10 +18,10 @@
           <button class="builder-toggle" id="panelToggle" type="button" aria-controls="sourcePanel" aria-expanded="true">Hide sources</button>
           <button class="reset-button" id="resetButton" type="button" aria-label="Reset conversation" title="Reset conversation">↺</button>
           <div class="mode-switcher" role="group" aria-label="Answer mode">
-            <button class="mode-button is-active" type="button" data-mode="simple">Simple</button>
-            <button class="mode-button" type="button" data-mode="code">Code</button>
-            <button class="mode-button" type="button" data-mode="deep">Deep</button>
-            <button class="mode-button" type="button" data-mode="quiz">Quiz</button>
+            <button class="mode-button is-active" type="button" data-mode="simple" title="Quick source-grounded answer">Simple</button>
+            <button class="mode-button" type="button" data-mode="code" title="Implementation, prototype, or test plan">Code</button>
+            <button class="mode-button" type="button" data-mode="deep" title="Synthesis, tradeoffs, and implications">Deep</button>
+            <button class="mode-button" type="button" data-mode="quiz" title="Practice, interview, or concept-test prompts">Quiz</button>
           </div>
         </div>
       </header>
@@ -152,8 +152,8 @@
         <section class="stage" aria-label="Companion">
           <div class="insight-card" aria-live="polite">
             <div class="insight-header">
-              <span>Insight</span>
-              <small>Source-grounded response</small>
+              <span id="insightModeLabel">Simple</span>
+              <small id="insightModeHint">Quick source-grounded answer</small>
             </div>
             <div id="answerText" class="insight-body">
               Ask about backprop, makemore, GPT from scratch, tokenizers, training neural nets, or Software 2.0.
@@ -194,7 +194,7 @@
       </p>
     </main>
 
-    <script src="data/sources.js?v=voice-insights-polish"></script>
-    <script src="script.js?v=voice-insights-polish"></script>
+    <script src="data/sources.js?v=mode-behaviors"></script>
+    <script src="script.js?v=mode-behaviors"></script>
   </body>
 </html>

@@ -66,6 +66,15 @@ This is a prototype and test version only.
 - Supports Simple, Code, Deep, and Quiz response modes.
 - Falls back to local/browser retrieval when hosted model keys are not configured.
 
+## Response Modes
+
+The four modes are intended to change the persona's job, not just the tone:
+
+- **Simple** gives the fastest source-grounded answer in plain language. Use it for quick learning, first-pass synthesis, or a direct profile reaction.
+- **Code** turns the answer into something operational: code, a prototype plan, an interview script, a test workflow, or a decision rule. Use it for technical learning, internal training, product tests, and lightweight concept testing.
+- **Deep** builds a fuller synthesis with mechanisms, tradeoffs, failure modes, and implications. Use it for expert-style personas, research synthesis, critique personas, strategy questions, and positioning work.
+- **Quiz** asks targeted questions instead of only explaining. Use it for learning checks, training, buyer-profile interviews, customer-profile reactions, and concept-test prompts.
+
 ## API Access
 
 Hosted AI features require API access.

@@ -16,6 +16,8 @@
   const voiceToggleLabel = document.querySelector("#voiceToggleLabel");
   const voiceSelect = document.querySelector("#voiceSelect");
   const voicePreviewButton = document.querySelector("#voicePreviewButton");
+  const insightModeLabel = document.querySelector("#insightModeLabel");
+  const insightModeHint = document.querySelector("#insightModeHint");
   const sourceForm = document.querySelector("#sourceForm") || document.querySelector("#youtubeForm");
   const sourceUrl = document.querySelector("#sourceUrl") || document.querySelector("#youtubeUrl");
   const sourceStatus = document.querySelector("#sourceStatus") || document.querySelector("#youtubeStatus");
@@ -65,6 +67,32 @@
   ]);
 
   let activeMode = "simple";
+  const modeProfiles = {
+    simple: {
+      label: "Simple",
+      hint: "Quick source-grounded answer",
+      prompt:
+        "Use Simple mode. Give a short answer in plain language: answer first, explain why it matters, then give one practical takeaway. Keep it to 2-4 compact paragraphs. This mode should work for learning companions, customer profiles, buyer personas, and research personas as a quick read."
+    },
+    code: {
+      label: "Code",
+      hint: "Prototype, workflow, or test plan",
+      prompt:
+        "Use Code mode. Convert the answer into something operational: a minimal implementation, prototype plan, decision rule, experiment, interview script, or testing workflow. Include code only when the question is technical; otherwise provide concrete steps, variables to observe, and a way to know if it worked."
+    },
+    deep: {
+      label: "Deep",
+      hint: "Synthesis, tradeoffs, and implications",
+      prompt:
+        "Use Deep mode. Build a source-grounded synthesis: mental model, mechanism, tradeoffs, failure modes, and implications. This is for expert-style education, research synthesis, critique personas, and strategy questions. Be coherent, not a bullet dump."
+    },
+    quiz: {
+      label: "Quiz",
+      hint: "Practice, interview, or concept-test prompts",
+      prompt:
+        "Use Quiz mode. Do not just explain. Ask 4-6 targeted questions that test understanding or surface a persona/profile reaction. For learning, make them practice questions. For consumer or buyer personas, make them concept-testing or decision prompts. End by asking the user to reply so you can grade or synthesize the responses."
+    }
+  };
   let typingTimer = null;
   let recognition = null;
   let speakingTimers = [];
@@ -382,10 +410,6 @@
       .slice(0, 4);
   }
 
-  function sentenceJoin(items) {
-    return items.filter(Boolean).join(" ");
-  }
-
   function formatTime(totalSeconds) {
     const safeSeconds = Math.max(0, Math.floor(totalSeconds || 0));
     const hours = Math.floor(safeSeconds / 3600);
@@ -557,7 +581,9 @@
       compilerStatusText.textContent = detail;
     }
     if (answerLayerStatus) {
-      answerLayerStatus.textContent = indexedPersonaReady ? "Indexed RAG + voice" : "Local RAG + voice";
+      const profile = modeProfiles[activeMode] || modeProfiles.simple;
+      const answerBase = indexedPersonaReady ? "Indexed RAG + voice" : "Local RAG + voice";
+      answerLayerStatus.textContent = `${answerBase} · ${profile.label}`;
     }
   }
 
@@ -627,6 +653,85 @@
       });
   }
 
+  function sourceTitleList(matches, limit = 3) {
+    return matches
+      .slice(0, limit)
+      .map((source) => source.title)
+      .join("; ");
+  }
+
+  function transcriptChunkLines(chunks, maxWords = 24) {
+    return chunks.slice(0, 3).map((chunk) => {
+      return `- Around ${formatTime(chunk.start)}: ${shortExcerpt(chunk.text, maxWords)}`;
+    });
+  }
+
+  function composeTranscriptModeAnswer(question, source, chunks) {
+    const lines = transcriptChunkLines(chunks);
+    const firstChunk = chunks[0];
+    const sourceUrl = firstChunk ? transcriptUrl(source, firstChunk.start) : source.url;
+
+    if (activeMode === "code") {
+      return [
+        `Code mode: here is how to turn "${question}" into something usable from "${source.title}".`,
+        "",
+        "Relevant transcript evidence:",
+        ...lines,
+        "",
+        "Operational version:",
+        "1. State the mechanism in one sentence.",
+        "2. Build the smallest prototype, example, or test where that mechanism shows up.",
+        "3. Compare the result against the source claim instead of trusting the vibe.",
+        "4. Keep one measurable check: output quality, failure case, user reaction, or correctness.",
+        "",
+        `Source: ${sourceUrl}`
+      ].join("\n");
+    }
+
+    if (activeMode === "deep") {
+      return [
+        `Deep mode: the useful read of "${question}" in "${source.title}" is the mechanism underneath the surface claim.`,
+        "",
+        "Evidence from the transcript:",
+        ...lines,
+        "",
+        "Synthesis:",
+        "- Mechanism: reduce the topic to the smallest moving part the source is pointing at.",
+        "- Tradeoff: ask what improves, what gets cheaper, and what new failure mode appears.",
+        "- Implication: the answer should change how you would learn, build, evaluate, or test the idea.",
+        "",
+        `Source: ${sourceUrl}`
+      ].join("\n");
+    }
+
+    if (activeMode === "quiz") {
+      return [
+        `Quiz mode: use this section of "${source.title}" to test whether you actually understand "${question}".`,
+        "",
+        "Source hints:",
+        ...lines,
+        "",
+        "Answer these:",
+        "1. What is the main claim in your own words?",
+        "2. What is the smallest example that would make the claim concrete?",
+        "3. What would count as evidence against this claim?",
+        "4. If this were a customer or buyer persona, what would they likely push back on?",
+        "",
+        "Reply with your answers and I will grade them against the source."
+      ].join("\n");
+    }
+
+    return [
+      `Simple mode: grounded in "${source.title}", here is the answer from the transcript.`,
+      "",
+      ...lines,
+      "",
+      "Takeaway: reduce the idea to the mechanism, then ask what changes when that mechanism becomes reliable.",
+      "",
+      `Source: ${sourceUrl}`
+    ].join("\n");
+  }
+
   function composeTranscriptSummary(question, source) {
     const entries = parseTranscript(source.text);
     if (!entries.length) {
@@ -660,8 +765,65 @@
         ? `- Transcript-level read: ${shortExcerpt(entries.map((entry) => entry.text).join(" "), 52)}`
         : "";
 
+    if (activeMode === "code") {
+      return [
+        `Code mode: I found the transcript for "${source.title}" and translated it into an implementation/test lens.`,
+        "",
+        "Main source points:",
+        ...topicLines,
+        fallbackLine,
+        timestampNote,
+        "",
+        "How to operationalize it:",
+        "1. Pick one claim from the source.",
+        "2. Turn it into a tiny prototype, workflow, or user-test prompt.",
+        "3. Define what would make the result useful or wrong.",
+        "4. Iterate with the transcript as the reference, not as generic inspiration."
+      ]
+        .filter(Boolean)
+        .join("\n");
+    }
+
+    if (activeMode === "deep") {
+      return [
+        `Deep mode: I found the transcript for "${source.title}" and grouped it by underlying mechanisms.`,
+        "",
+        shortVersion,
+        "",
+        "Core themes:",
+        ...topicLines,
+        fallbackLine,
+        timestampNote,
+        "",
+        "Synthesis: this source is useful when you want to connect a surface idea to the engineering judgment, tradeoffs, and failure modes behind it."
+      ]
+        .filter(Boolean)
+        .join("\n");
+    }
+
+    if (activeMode === "quiz") {
+      return [
+        `Quiz mode: I found the transcript for "${source.title}". Use these prompts to test understanding or run a lightweight concept interview.`,
+        "",
+        "Source hints:",
+        ...topicLines.slice(0, 4),
+        fallbackLine,
+        timestampNote,
+        "",
+        "Questions:",
+        "1. What is the strongest claim in this source?",
+        "2. What example would make it concrete?",
+        "3. What would a skeptical buyer, learner, or stakeholder object to?",
+        "4. What source detail would you cite back as evidence?",
+        "",
+        "Reply with answers and I will grade or synthesize them."
+      ]
+        .filter(Boolean)
+        .join("\n");
+    }
+
     return [
-      `I found the transcript for "${source.title}" and I am using that video as the source.`,
+      `Simple mode: I found the transcript for "${source.title}" and I am using that video as the source.`,
       "",
       shortVersion,
       "",
@@ -670,7 +832,7 @@
       fallbackLine,
       timestampNote,
       "",
-      "Companion framing: do not think of this as simply faster code generation. Think of it as a new computing interface where context, prompts, tools, and judgment become the main levers."
+      "Takeaway: use the transcript as grounding, then ask a focused follow-up when you want a specific section explained."
     ]
       .filter(Boolean)
       .join("\n");
@@ -682,6 +844,15 @@
 
     const explicitTime = parseTimeMention(question);
     if (explicitTime !== null) {
+      if (activeMode !== "simple") {
+        return composeTranscriptModeAnswer(question, source, [
+          {
+            start: explicitTime,
+            text: chunkAround(entries, explicitTime),
+            score: 1
+          }
+        ]);
+      }
       return [
         `Around ${formatTime(explicitTime)} in "${source.title}", the relevant transcript section says, in plain English:`,
         "",
@@ -701,40 +872,47 @@
     }
 
     return [
-      `Grounded in "${source.title}", here is the answer from the transcript:`,
-      "",
-      ...chunks.slice(0, 3).map((chunk) => {
-        return `- Around ${formatTime(chunk.start)}: ${shortExcerpt(chunk.text, 22)}`;
-      }),
-      "",
-      "Companion framing: the useful move is to reduce the idea to a mechanism, then ask what changes when the mechanism becomes reliable."
+      composeTranscriptModeAnswer(question, source, chunks)
     ].join("\n");
   }
 
   function composeSimple(question, matches) {
     const top = matches[0];
     const second = matches[1];
-    return sentenceJoin([
-      `Let's unpack "${question}" from the loaded public sources.`,
-      `The core idea is: ${top.principles[0]}`,
-      top.patterns[0] ? `A practical way to think about it: ${top.patterns[0]}` : "",
-      second ? `Related source context: ${second.summary}` : "",
-      "I would treat this as source-grounded guidance, not a statement from Andrej himself."
-    ]);
+    return [
+      `Simple mode: ${top.principles[0]}`,
+      "",
+      `Why it matters: ${top.summary}`,
+      "",
+      top.patterns[0] ? `Practical takeaway: ${top.patterns[0]}` : "",
+      second ? `Related source: ${second.title} adds that ${shortExcerpt(second.summary, 22)}` : "",
+      "",
+      `Grounded in: ${sourceTitleList(matches)}.`
+    ]
+      .filter(Boolean)
+      .join("\n");
   }
 
   function composeCode(question, matches) {
     const top = matches[0];
     const support = matches[1];
     return [
-      `For "${question}", the code-first mental model is: ${top.principles[0]}`,
+      `Code mode: turn "${question}" into a prototype, workflow, or test plan.`,
+      "",
+      `Working model: ${top.principles[0]}`,
+      "",
+      "Minimal loop:",
+      "1. Define the input you will give the persona, learner, or system.",
+      "2. Decide what output would count as useful.",
+      "3. Run the smallest example and inspect the failure case.",
+      "4. Add source context only when it changes the answer.",
       "",
       "```js",
       top.codeHint,
       "```",
       "",
       top.patterns[1] ? `Implementation habit: ${top.patterns[1]}` : "",
-      support ? `I would cross-check this against ${support.title}.` : ""
+      support ? `Cross-check: ${support.title} is the next source to inspect.` : ""
     ]
       .filter(Boolean)
       .join("\n");
@@ -747,27 +925,37 @@
       .map((source) => `${source.title}: ${source.principles[0]}`)
       .join(" ");
 
-    return sentenceJoin([
-      `Deep pass on "${question}": start with the smallest version of the system where the mechanism is visible.`,
-      top.summary,
-      `First principle: ${top.principles[0]}`,
-      top.principles[1] ? `Second principle: ${top.principles[1]}` : "",
-      `Working pattern: ${top.patterns.join(" ")}`,
-      sourceThread ? `Connected sources: ${sourceThread}` : "",
-      "The companion should answer this way only when the retrieval set gives enough grounding."
-    ]);
+    return [
+      `Deep mode: "${question}" is best answered as a mechanism plus tradeoffs, not as a slogan.`,
+      "",
+      `Mechanism: ${top.principles[0]}`,
+      top.principles[1] ? `Second-order idea: ${top.principles[1]}` : "",
+      "",
+      `Why this source matters: ${top.summary}`,
+      "",
+      "Tradeoffs and failure modes:",
+      ...top.patterns.slice(0, 3).map((pattern) => `- ${pattern}`),
+      "",
+      sourceThread ? `Connected source thread: ${sourceThread}` : "",
+      "Where to be careful: if the source base does not cover the question, the persona should abstain or ask for more material."
+    ]
+      .filter(Boolean)
+      .join("\n");
   }
 
   function composeQuiz(question, matches) {
     const top = matches[0];
     return [
-      `Let's quiz it instead of just reading it. Topic: ${question}`,
+      `Quiz mode: do not just read about "${question}". Test the idea.`,
       "",
-      `1. In your own words, why does this matter? Hint: ${top.principles[0]}`,
-      `2. What is the smallest toy version you could implement? Hint: ${top.patterns[0]}`,
-      `3. What diagnostic would tell you the idea is working? Hint: ${top.patterns[1] || top.summary}`,
+      "Answer these:",
+      `1. In your own words, what is the core claim? Hint: ${top.principles[0]}`,
+      `2. What is the smallest concrete example or prototype? Hint: ${top.patterns[0]}`,
+      `3. What would a skeptical learner, buyer, or customer profile push back on? Hint: ${top.patterns[1] || top.summary}`,
+      "4. What source detail would you cite as evidence?",
       "",
-      "Answer these, then ask me to grade them against the source base."
+      `Evidence base: ${sourceTitleList(matches)}.`,
+      "Reply with your answers and I will grade them against the source base."
     ].join("\n");
   }
 
@@ -899,11 +1087,7 @@
   }
 
   function personaQuestion(question, matches = []) {
-    const instructions = {
-      code: "Answer this code-first, with implementation-level detail when useful.",
-      deep: "Give a deeper conceptual explanation, but keep it as a coherent explanation, not a stitched outline.",
-      quiz: "Turn this into a short teaching quiz, then include the answer key."
-    };
+    const modeProfile = modeProfiles[activeMode] || modeProfiles.simple;
     const layerInstruction = [
       "Answer style:",
       "- Give a direct, coherent explanation in a clear first-principles teaching style.",
@@ -911,16 +1095,19 @@
       "- Do not expose internal labels such as [Fact 3], [1], chunks, passages, or retrieved text.",
       "- For normal questions, avoid horizontal rules, long stage-by-stage outlines, and table-of-contents formatting.",
       "- Use source names or timestamps only naturally, and only when helpful.",
-      "- Keep normal answers to 3-5 compact paragraphs unless the user asks for a full deep dive."
+      "- Keep normal answers to 3-5 compact paragraphs unless the user asks for a full deep dive.",
+      "- For public thinker personas, stay clearly source-grounded and do not impersonate the real person.",
+      "- For consumer, buyer, research, or critique personas, answer as an evidence-grounded profile built from supplied material, not as a generic chatbot."
     ].join("\n");
-    const modeInstruction = instructions[activeMode] || "";
+    const modeInstruction = [`Current mode: ${modeProfile.label}.`, modeProfile.prompt].join("\n");
     const localContext = localContextForQuestion(question, matches);
     return [layerInstruction, modeInstruction, localContext, `Question: ${question}`].filter(Boolean).join("\n\n");
   }
 
   function markdownLite(text) {
     return escapeHtml(text)
-      .replace(/```js\n([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
+      .replace(/```[a-zA-Z0-9_-]*\n([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
+      .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
       .replace(
         /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
         '<a href="$2" target="_blank" rel="noreferrer">$1</a>'
@@ -1396,13 +1583,38 @@
   }
 
   function setupModes() {
+    updateModeCopy();
     modeButtons.forEach((button) => {
       button.addEventListener("click", () => {
         activeMode = button.dataset.mode;
-        modeButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+        updateModeCopy();
+        showModeReadyMessage();
         questionInput.focus();
       });
     });
+  }
+
+  function updateModeCopy() {
+    const profile = modeProfiles[activeMode] || modeProfiles.simple;
+    modeButtons.forEach((button) => {
+      const isActive = button.dataset.mode === activeMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+    if (insightModeLabel) insightModeLabel.textContent = profile.label;
+    if (insightModeHint) insightModeHint.textContent = profile.hint;
+    if (answerLayerStatus) {
+      const answerBase = indexedPersonaReady ? "Indexed RAG + voice" : "Local RAG + voice";
+      answerLayerStatus.textContent = `${answerBase} · ${profile.label}`;
+    }
+  }
+
+  function showModeReadyMessage() {
+    const profile = modeProfiles[activeMode] || modeProfiles.simple;
+    stopSpeaking();
+    answerText.innerHTML = markdownLite(
+      `${profile.label} mode selected. ${profile.hint}. Ask a question to use this response shape.`
+    );
   }
 
   function setPanelVisible(isVisible) {
