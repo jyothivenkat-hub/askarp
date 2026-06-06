@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Askarp</title>
-    <link rel="stylesheet" href="styles.css?v=askarp-hide-model-badge" />
+    <link rel="stylesheet" href="styles.css?v=voice-insights-polish" />
   </head>
   <body>
     <main class="app-shell" data-state="idle">
@@ -62,7 +62,7 @@
           <label class="voice-picker">
             <span class="sr-only">Voice style</span>
             <select id="voiceSelect" aria-label="Voice style">
-              <option value="">Auto voice</option>
+              <option value="">Auto low narrator</option>
             </select>
           </label>
           <button class="voice-preview-button" id="voicePreviewButton" type="button" title="Preview selected voice">Preview</button>
@@ -150,10 +150,14 @@
         </aside>
 
         <section class="stage" aria-label="Companion">
-          <div class="bubble" aria-live="polite">
-            <p id="answerText">
+          <div class="insight-card" aria-live="polite">
+            <div class="insight-header">
+              <span>Insight</span>
+              <small>Source-grounded response</small>
+            </div>
+            <div id="answerText" class="insight-body">
               Ask about backprop, makemore, GPT from scratch, tokenizers, training neural nets, or Software 2.0.
-            </p>
+            </div>
           </div>
 
           <div class="pet-wrap" aria-label="Animated tutor avatar">
@@ -190,7 +194,7 @@
       </p>
     </main>
 
-    <script src="data/sources.js?v=askarp-hide-model-badge"></script>
-    <script src="script.js?v=askarp-hide-model-badge"></script>
+    <script src="data/sources.js?v=voice-insights-polish"></script>
+    <script src="script.js?v=voice-insights-polish"></script>
   </body>
 </html>

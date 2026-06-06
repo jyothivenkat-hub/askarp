@@ -79,6 +79,7 @@
   const avatarStorageKey = "karpathy-companion-avatar";
   const voiceMutedStorageKey = "karpathy-companion-voice-muted";
   const selectedVoiceStorageKey = "karpathy-companion-selected-voice";
+  const voiceStylePrefix = "__voice_style:";
   let voiceMuted = localStorage.getItem(voiceMutedStorageKey) === "true";
 
   function resolveApiBase() {
@@ -1044,30 +1045,71 @@
     const name = `${voice.name} ${voice.lang}`.toLowerCase();
     let score = 0;
     if (voice.lang && voice.lang.toLowerCase().startsWith("en")) score += 20;
-    if (/daniel|alex|jamie|tom|matthew|aaron|nathan|liam|ryan|guy|google us english|microsoft.*guy/.test(name)) {
-      score += 20;
-    }
+    if (isLikelyMaleVoice(voice)) score += 28;
     if (/enhanced|premium|natural|neural|google|microsoft/.test(name)) score += 16;
-    if (/compact|novelty|whisper|zarvox|trinoids|bells|bad news|good news/.test(name)) score -= 40;
+    if (/compact|novelty|whisper|zarvox|trinoids|bells|bad news|good news|bahh|boing|bubbles/.test(name)) score -= 40;
     return score;
+  }
+
+  function cleanVoiceName(voice) {
+    return (voice.name || "Browser voice")
+      .replace(/\s*\([^)]*\)/g, "")
+      .replace(/[()]+/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isLikelyMaleVoice(voice) {
+    const name = `${voice.name} ${voice.voiceURI || ""}`.toLowerCase();
+    return /\b(daniel|alex|fred|ralph|tom|thomas|matthew|aaron|nathan|liam|ryan|guy|david|george|oliver|arthur|brian|michael|mark|james|paul|richard|robert|eddy|grandpa|reed|rocko)\b|microsoft.*guy|google us english/.test(
+      name
+    );
+  }
+
+  function isLikelyHigherVoice(voice) {
+    const name = `${voice.name} ${voice.voiceURI || ""}`.toLowerCase();
+    return /samantha|victoria|karen|moira|tessa|fiona|susan|zira|hazel|aria|jenny|female|flo|grandma|sandy|shelley/.test(name);
+  }
+
+  function isNoveltyVoice(voice) {
+    const name = `${voice.name} ${voice.voiceURI || ""}`.toLowerCase();
+    return /albert|cellos|hysterical|jester|junior|organ|superstar|wobble|bad news|bahh|bells|boing|bubbles|good news|trinoids|whisper|zarvox/.test(name);
+  }
+
+  function voiceToneLabel(voice) {
+    if (isLikelyMaleVoice(voice)) return "low/male-style";
+    if (isLikelyHigherVoice(voice)) return "higher";
+    return "neutral";
   }
 
   function voiceKey(voice) {
     return [voice.voiceURI || "", voice.name || "", voice.lang || ""].join("|||");
   }
 
-  function selectedVoice() {
-    if (!("speechSynthesis" in window)) return null;
+  function selectedVoiceProfile() {
+    if (!("speechSynthesis" in window)) return { voice: null, rate: 0.88, pitch: 0.74 };
     const selectedValue = voiceSelect.value;
+    if (selectedValue === `${voiceStylePrefix}clear`) {
+      return { voice: null, rate: 0.92, pitch: 0.9 };
+    }
+    if (selectedValue === `${voiceStylePrefix}low`) {
+      const voice = [...availableVoices].sort((left, right) => preferredVoiceScore(right) - preferredVoiceScore(left))[0] || null;
+      return { voice, rate: 0.86, pitch: 0.68 };
+    }
     if (selectedValue) {
-      return (
+      const voice =
         availableVoices.find((voice) => voiceKey(voice) === selectedValue) ||
         availableVoices.find((voice) => (voice.voiceURI || voice.name) === selectedValue) ||
         availableVoices.find((voice) => voice.name === selectedValue) ||
-        null
-      );
+        null;
+      return {
+        voice,
+        rate: 0.88,
+        pitch: voice && isLikelyMaleVoice(voice) ? 0.82 : 0.72
+      };
     }
-    return [...availableVoices].sort((left, right) => preferredVoiceScore(right) - preferredVoiceScore(left))[0] || null;
+    const voice = [...availableVoices].sort((left, right) => preferredVoiceScore(right) - preferredVoiceScore(left))[0] || null;
+    return { voice, rate: 0.86, pitch: voice && isLikelyMaleVoice(voice) ? 0.82 : 0.68 };
   }
 
   function populateVoices() {
@@ -1078,11 +1120,30 @@
       .sort((left, right) => preferredVoiceScore(right) - preferredVoiceScore(left));
 
     const previous = localStorage.getItem(selectedVoiceStorageKey) || voiceSelect.value;
-    voiceSelect.innerHTML = '<option value="">Auto voice (best available)</option>';
-    availableVoices.slice(0, 18).forEach((voice) => {
+    voiceSelect.innerHTML = "";
+
+    const autoOption = document.createElement("option");
+    autoOption.value = "";
+    autoOption.textContent = "Auto low narrator";
+    voiceSelect.appendChild(autoOption);
+
+    const lowOption = document.createElement("option");
+    lowOption.value = `${voiceStylePrefix}low`;
+    lowOption.textContent = "Low narrator (browser default)";
+    voiceSelect.appendChild(lowOption);
+
+    const clearOption = document.createElement("option");
+    clearOption.value = `${voiceStylePrefix}clear`;
+    clearOption.textContent = "Clear narrator (browser default)";
+    voiceSelect.appendChild(clearOption);
+
+    const usefulVoices = availableVoices.filter(
+      (voice) => isLikelyMaleVoice(voice) || isLikelyHigherVoice(voice) || !isNoveltyVoice(voice)
+    );
+    usefulVoices.forEach((voice) => {
       const option = document.createElement("option");
       option.value = voiceKey(voice);
-      option.textContent = `${voice.name.replace(/\s*\([^)]*\)\s*/g, "")}${voice.lang ? ` · ${voice.lang}` : ""}`;
+      option.textContent = `${cleanVoiceName(voice)}${voice.lang ? ` · ${voice.lang}` : ""} · ${voiceToneLabel(voice)}`;
       voiceSelect.appendChild(option);
     });
     if (previous && Array.from(voiceSelect.options).some((option) => option.value === previous)) {
@@ -1144,23 +1205,24 @@
     if (muted) stopSpeaking();
   }
 
-  function speakChunks(chunks, voice, index = 0, runId = speechRunId) {
+  function speakChunks(chunks, voiceProfile, index = 0, runId = speechRunId) {
     if (runId !== speechRunId) return;
     if (index >= chunks.length) {
       setState("idle");
       return;
     }
 
+    const profile = voiceProfile || { voice: null, rate: 0.88, pitch: 0.74 };
     const utterance = new SpeechSynthesisUtterance(chunks[index]);
-    if (voice) utterance.voice = voice;
-    utterance.lang = voice?.lang || "en-US";
-    utterance.rate = 0.9;
-    utterance.pitch = 0.82;
+    if (profile.voice) utterance.voice = profile.voice;
+    utterance.lang = profile.voice?.lang || "en-US";
+    utterance.rate = profile.rate;
+    utterance.pitch = profile.pitch;
     utterance.volume = 1;
     utterance.onstart = () => setState("talking");
     utterance.onend = () => {
       if (runId !== speechRunId) return;
-      const timer = window.setTimeout(() => speakChunks(chunks, voice, index + 1, runId), 130);
+      const timer = window.setTimeout(() => speakChunks(chunks, profile, index + 1, runId), 130);
       speakingTimers.push(timer);
     };
     utterance.onerror = () => {
@@ -1176,7 +1238,7 @@
     const runId = speechRunId;
     const chunks = speechChunks(text);
     if (!chunks.length) return;
-    const timer = window.setTimeout(() => speakChunks(chunks, selectedVoice(), 0, runId), 90);
+    const timer = window.setTimeout(() => speakChunks(chunks, selectedVoiceProfile(), 0, runId), 90);
     speakingTimers.push(timer);
   }
 

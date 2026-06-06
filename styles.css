@@ -68,7 +68,7 @@ button {
 .topbar,
 .askbar,
 .source-panel,
-.bubble {
+.insight-card {
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -493,31 +493,55 @@ h1 {
     linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(238, 244, 238, 0.86));
 }
 
-.bubble {
+.insight-card {
   width: min(680px, calc(100% - 40px));
   min-height: 144px;
   align-self: start;
   margin-top: 32px;
-  padding: 20px;
+  padding: 0;
   position: relative;
   z-index: 2;
+  overflow: hidden;
 }
 
-.bubble::after {
+.insight-card::before {
   content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -12px;
-  width: 24px;
-  height: 24px;
-  background: inherit;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  transform: translateX(-50%) rotate(45deg);
+  display: block;
+  height: 5px;
+  background: linear-gradient(90deg, var(--mint-strong), var(--blue), var(--gold));
+}
+
+.insight-header {
+  min-height: 42px;
+  padding: 12px 18px 10px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(216, 221, 213, 0.8);
+  background: rgba(247, 248, 244, 0.72);
+}
+
+.insight-header span {
+  color: var(--mint-strong);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.insight-header small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
 }
 
 #answerText {
   margin: 0;
+}
+
+.insight-body {
+  padding: 18px 20px 22px;
   font-size: clamp(1rem, 1.25vw, 1.18rem);
   line-height: 1.55;
 }
@@ -1309,11 +1333,21 @@ h1 {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .bubble {
+  .insight-card {
     width: calc(100% - 24px);
     min-height: 174px;
     margin-top: 14px;
-    padding: 16px;
+  }
+
+  .insight-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 14px;
+  }
+
+  .insight-body {
+    padding: 14px 16px 18px;
   }
 
   .pet-wrap {
