@@ -1,60 +1,83 @@
 # Askarp
 
-**A test-only persona engine for asking questions, simulating characters, and trying lightweight concept tests.**
+**A public, test-only persona engine for source-grounded characters, learning companions, consumer profiles, and lightweight concept testing.**
 
-Askarp is an avatar-first prototype for building source-grounded personas. A persona can represent an expert, creator, teacher, customer segment, consumer profile, or research participant pattern. You add source material, define the character surface, and ask questions through a simple speaking avatar interface.
+Askarp is an avatar-first prototype for building interactive personas from source material. A persona can be used to learn a topic, ask questions, explore how a profile might react to an idea, or run early concept-testing conversations.
+
+The current demo is a Karpathy-inspired learning companion grounded in public Andrej Karpathy materials. It is not Andrej Karpathy, does not impersonate him, and should not be treated as speaking on his behalf.
 
 [Live demo](https://askarp.vercel.app)
 
 <img src="assets/andrej-pixel-pet.png" alt="Askarp pixel avatar" width="180">
 
-## Status
+## What Is Askarp?
 
-This repository is a **test-only prototype**. It does not include personal API keys, production credentials, or a production data store. Anyone running or deploying it must add their own API keys through local environment variables or their hosting provider.
+Askarp is a simple persona system with three layers:
 
-The current demo character is **Askarp**, a Karpathy-inspired learning companion grounded in public Andrej Karpathy materials. The broader application is a reusable persona system for learning, profile simulation, and early concept testing.
+**Character Layer**  
+The visible persona: name, avatar, tone, and interaction style.
+
+**Knowledge Layer**  
+The source base: public articles, transcripts, videos, notes, interviews, research docs, support tickets, or other uploaded material.
+
+**Answer Layer**  
+The response behavior: beginner-friendly, critical, concise, first-principles, buyer-like, expert-like, skeptical, or quiz-based.
+
+Together, these layers create a source-grounded character that users can talk to in plain language.
 
 ## Why This Exists
 
-Most chatbots feel generic. Askarp explores a more character-based interface: a persona with an avatar, a knowledge base, and a response style.
+Most AI chat interfaces feel generic. Askarp explores a more specific interface: a character built from a defined source base, with a clear role, voice, and behavior.
 
-Possible applications:
+The goal is not open-ended roleplay. The goal is to make personas useful for:
 
-- Expert personas for learning and research.
-- Consumer profiles for concept testing.
-- Buyer profiles for messaging and positioning tests.
-- Interview synthesis from user research notes.
-- Internal training characters.
-- Critique personas for product ideas.
-- Creator or public-thinker companions built from public sources.
+- Learning from public thinkers, creators, or experts.
+- Asking questions against a source-grounded profile.
+- Creating lightweight research or customer personas.
+- Testing early product ideas, messaging, and concepts.
+- Exploring how different profiles might react to tradeoffs.
+- Turning research notes or public material into interactive conversations.
 
-## Persona Model
+## Current Demo
 
-Each persona has three layers:
+The first test persona is Askarp, a Karpathy-inspired technical learning companion.
 
-1. **Character**
-   The avatar, name, tone, and interaction style.
+It uses public source material to answer questions, explain ideas from first principles, and support different learning modes.
 
-2. **Knowledge**
-   The source base: transcripts, articles, research notes, survey responses, support tickets, or interview excerpts.
+This is a prototype and test version only.
 
-3. **Answer Behavior**
-   The response rules: concise, skeptical, beginner-friendly, buyer-like, expert-like, first-principles, critical, or exploratory.
+## Possible Use Cases
+
+- Learning companions based on public source material.
+- Expert-style personas for education or internal training.
+- Customer profiles for early concept testing.
+- Buyer personas for messaging exploration.
+- Research personas from interviews, notes, or surveys.
+- Critique personas for product, strategy, or positioning work.
+- Interactive synthesis from qualitative research material.
 
 ## What It Does Today
 
-- Uses a pixel-pet avatar instead of a standard chat log.
-- Answers through speech bubbles, optional browser voice, and source references.
-- Lets users add public article links and YouTube links as knowledge sources.
-- Breaks source text into browser-side retrieval chunks.
+- Uses a pixel-pet avatar instead of a standard chatbot interface.
+- Lets users ask questions through a character-based UI.
+- Supports public articles and YouTube links as source material.
+- Breaks source text into chunks for retrieval.
+- Answers in text with optional browser voice.
 - Supports Simple, Code, Deep, and Quiz response modes.
 - Falls back to local/browser retrieval when hosted model keys are not configured.
 
-## Bring Your Own Keys
+## API Access
 
-No real keys should be committed to this repo.
+Hosted AI features require API access.
 
-Use `.env.example` as the template:
+You can either:
+
+- Bring your own API keys and run the test version yourself.
+- Ask me for access to try the hosted version.
+
+This project is experimental and intended for testing, learning, and lightweight research exploration. It is not a replacement for validated research with real users.
+
+No real keys should be committed to this repo. Use `.env.example` as the template:
 
 ```bash
 cp .env.example .env
