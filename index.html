@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Askarp</title>
+    <link rel="stylesheet" href="styles.css?v=askarp-hide-model-badge" />
+  </head>
+  <body>
+    <main class="app-shell" data-state="idle">
+      <header class="topbar" aria-label="Companion header">
+        <div>
+          <h1>Askarp</h1>
+          <p class="eyebrow">Karpathy's condensed wisdom</p>
+        </div>
+        <div class="top-actions">
+          <span class="persona-badge" id="personaBadge" hidden>Local sources</span>
+          <button class="builder-toggle" id="panelToggle" type="button" aria-controls="sourcePanel" aria-expanded="true">Hide sources</button>
+          <button class="reset-button" id="resetButton" type="button" aria-label="Reset conversation" title="Reset conversation">↺</button>
+          <div class="mode-switcher" role="group" aria-label="Answer mode">
+            <button class="mode-button is-active" type="button" data-mode="simple">Simple</button>
+            <button class="mode-button" type="button" data-mode="code">Code</button>
+            <button class="mode-button" type="button" data-mode="deep">Deep</button>
+            <button class="mode-button" type="button" data-mode="quiz">Quiz</button>
+          </div>
+        </div>
+      </header>
+
+      <form class="askbar" id="askForm" autocomplete="off">
+        <button class="icon-button" id="micButton" type="button" aria-label="Speak question" title="Speak question">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z" />
+            <path d="M19 11a7 7 0 0 1-14 0" />
+            <path d="M12 18v4" />
+            <path d="M8 22h8" />
+          </svg>
+        </button>
+        <label class="input-wrap">
+          <span class="sr-only">Ask a question</span>
+          <input
+            id="questionInput"
+            name="question"
+            type="text"
+            placeholder="Ask Askarp to explain something..."
+            autofocus
+          />
+        </label>
+        <div class="voice-controls">
+          <button class="mute-button" id="voiceToggle" type="button" aria-pressed="false" aria-label="Mute voice" title="Mute voice">
+            <svg class="voice-on-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 10v4h4l5 4V6l-5 4H4Z" />
+              <path d="M16 9a4 4 0 0 1 0 6" />
+              <path d="M18.5 6.5a8 8 0 0 1 0 11" />
+            </svg>
+            <svg class="voice-off-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 10v4h4l5 4V6l-5 4H4Z" />
+              <path d="m17 9 4 4" />
+              <path d="m21 9-4 4" />
+            </svg>
+            <span id="voiceToggleLabel">Mute</span>
+          </button>
+          <label class="voice-picker">
+            <span class="sr-only">Voice style</span>
+            <select id="voiceSelect" aria-label="Voice style">
+              <option value="">Auto voice</option>
+            </select>
+          </label>
+          <button class="voice-preview-button" id="voicePreviewButton" type="button" title="Preview selected voice">Preview</button>
+        </div>
+        <button class="send-button" type="submit" aria-label="Ask">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 19V5" />
+            <path d="m5 12 7-7 7 7" />
+          </svg>
+        </button>
+      </form>
+
+      <section class="workspace" aria-label="Tutor workspace">
+        <aside class="source-panel" id="sourcePanel" aria-label="Persona builder">
+          <div class="panel-heading">
+            <span class="panel-status">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span id="groundingLabel">Ready</span>
+            </span>
+          </div>
+          <div id="serverBanner" class="server-banner" hidden role="status" aria-live="polite"></div>
+          <details class="panel-section" open>
+            <summary>
+              <span>Add source</span>
+              <small>YouTube transcript or article</small>
+            </summary>
+            <form class="source-tools" id="sourceForm" autocomplete="off">
+              <label>
+                <span class="sr-only">Add YouTube or article</span>
+                <input
+                  id="sourceUrl"
+                  name="sourceUrl"
+                  type="url"
+                  placeholder="Paste a YouTube or article link"
+                />
+              </label>
+              <button type="submit">Compile</button>
+              <p id="sourceStatus" aria-live="polite"></p>
+            </form>
+          </details>
+
+          <details class="panel-section">
+            <summary>
+              <span>Persona layers</span>
+              <small id="layerSummary">Tone · knowledge · answer</small>
+            </summary>
+            <section class="layer-panel" aria-label="Persona layers">
+              <div class="layer-card">
+                <span>Tone</span>
+                <strong id="toneLayerStatus">Karpathy-style tutor</strong>
+                <small>Clear, first-principles, source-bound.</small>
+              </div>
+              <div class="layer-card">
+                <span>Knowledge</span>
+                <strong id="knowledgeLayerStatus">Starter corpus loaded</strong>
+                <small id="compilerStatusText">Add a link to extract and compile chunks.</small>
+              </div>
+              <div class="layer-card">
+                <span>Answer</span>
+                <strong id="answerLayerStatus">Voice + text search</strong>
+                <small>Answers cite retrieved sources.</small>
+              </div>
+            </section>
+          </details>
+
+          <details class="panel-section">
+            <summary>
+              <span>Avatar</span>
+              <small>Optional custom image</small>
+            </summary>
+            <label class="avatar-tools" id="avatarDropZone">
+              <span>Avatar image</span>
+              <input id="avatarUpload" type="file" accept="image/*" />
+              <small>Choose, drop, or paste the exact PNG you want shown.</small>
+            </label>
+          </details>
+
+          <details class="panel-section source-section">
+            <summary>
+              <span>Loaded sources</span>
+              <small id="sourceCountLabel">Source list</small>
+            </summary>
+            <div id="sourceList" class="source-list"></div>
+          </details>
+        </aside>
+
+        <section class="stage" aria-label="Companion">
+          <div class="bubble" aria-live="polite">
+            <p id="answerText">
+              Ask about backprop, makemore, GPT from scratch, tokenizers, training neural nets, or Software 2.0.
+            </p>
+          </div>
+
+          <div class="pet-wrap" aria-label="Animated tutor avatar">
+            <div class="pet-shadow" aria-hidden="true"></div>
+            <div class="thought-code" aria-hidden="true">
+              <span>loss.backward()</span>
+              <span>tokens → logits</span>
+              <span>tiny gradients</span>
+            </div>
+
+            <div class="pet pixel-pet" id="petAvatar" aria-label="Andrej Karpathy pixel tutor pet" role="button" tabindex="0">
+              <div class="pixel-pet__orbit" aria-hidden="true">
+                <span class="pixel-pet__orbit-item pixel-pet__orbit-brain">🧠</span>
+                <span class="pixel-pet__orbit-item pixel-pet__orbit-spark">⚡</span>
+                <span class="pixel-pet__orbit-item pixel-pet__orbit-tokens">🔢</span>
+              </div>
+
+              <img
+                class="pet-image pixel-pet__img"
+                id="petImage"
+                src="assets/andrej-pixel-pet.png"
+                alt="Andrej Karpathy pixel tutor pet"
+                width="256"
+                height="256"
+              />
+              <span class="pet-empty-label" aria-hidden="true">Drop a custom avatar to replace Andrej</span>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <p class="disclaimer">
+        This is an AI tutor interface grounded in public Andrej Karpathy materials. It is not Andrej Karpathy and does not clone his voice or identity.
+      </p>
+    </main>
+
+    <script src="data/sources.js?v=askarp-hide-model-badge"></script>
+    <script src="script.js?v=askarp-hide-model-badge"></script>
+  </body>
+</html>

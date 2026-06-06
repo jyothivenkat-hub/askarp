@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" shape-rendering="crispEdges">
+  <title>Avatar placeholder</title>
+  <path fill="#111817" d="M72 70h112v112H72z"/>
+  <path fill="#f7f8f4" d="M84 82h88v88H84z"/>
+  <path fill="#d8ddd5" d="M96 94h64v12H96zM96 118h64v12H96zM96 142h40v12H96z"/>
+  <path fill="#2aa87c" d="M140 140h20v20h-20z"/>
+</svg>

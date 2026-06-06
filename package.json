@@ -1,0 +1,9 @@
+{
+  "name": "askarp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Test-only persona engine prototype. Bring your own API keys.",
+  "scripts": {
+    "check": "node scripts/check-js.mjs"
+  }
+}

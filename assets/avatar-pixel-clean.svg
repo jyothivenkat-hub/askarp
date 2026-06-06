@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" shape-rendering="crispEdges">
+  <title>Pixel tutor avatar</title>
+  <g id="legs">
+    <path fill="#111" d="M86 184h34v48H78v-12h8zM137 184h34v36h8v12h-42z"/>
+    <path fill="#2f3c41" d="M92 184h28v38H86v-12h6zM137 184h28v26h8v12h-36z"/>
+    <path fill="#161616" d="M77 219h45v14H70v-8h7zM135 219h45v14h-51v-8h6z"/>
+    <path fill="#353535" d="M84 214h35v9H77v-5h7zM142 214h31v9h-38v-5h7z"/>
+  </g>
+  <g id="body">
+    <path fill="#080909" d="M74 126h108v64h-9v15h-38v-41h-14v41H83v-15h-9z"/>
+    <path fill="#181a1a" d="M84 135h88v50h-11v11h-26v-41h-14v41H95v-11H84z"/>
+    <path fill="#242626" d="M88 137h72v15h8v26h-15v10h-50v-10H88z"/>
+    <path fill="#ffc08a" d="M67 174h18v22H68v-7h-5v-10h4zM172 174h18v15h-5v7h-17v-22z"/>
+    <path fill="#0d0e0e" d="M77 133h20v52H84v-42h-7zM159 133h20v52h-13v-42h-7z"/>
+  </g>
+  <g id="neck">
+    <path fill="#0b0b0b" d="M105 113h46v24h-7v9h-32v-9h-7z"/>
+    <path fill="#f0ae79" d="M113 113h30v20h-5v5h-20v-5h-5z"/>
+  </g>
+  <g id="head-outline">
+    <path fill="#060606" d="M84 31h88v8h14v12h9v17h7v58h-7v16h-10v12h-14v10h-18v8h-50v-8H85v-10H71v-12H61v-16h-7V68h7V51h9V39h14z"/>
+  </g>
+  <g id="hair">
+    <path fill="#17110d" d="M85 28h86v8h15v13h10v32h-9v34h-12V72h-11V57h-26v9h-25v-9H91v20H78v38H65V85H55V65h8V50h10V38h12z"/>
+    <path fill="#35251b" d="M91 36h75v8h15v12h8v22h-9V65h-15V50h-28v9h-25v-9H95v18H82v31H70V70h8V55h13z"/>
+    <path fill="#674733" d="M108 40h35v7h22v8h12v8h-32v-7h-27v-8h-18zM80 61h21v7H85v11H72V68h8zM149 42h16v7h13v7h-19v-6h-10z"/>
+    <path fill="#8a6349" d="M116 43h26v5h18v6h-23v-5h-21zM86 68h14v6H84zM157 47h10v5h11v5h-15v-5h-6z"/>
+  </g>
+  <g id="face">
+    <path fill="#f4b780" d="M85 65h30v9h29v-9h27v15h12v48h-7v15h-10v10h-16v8h-45v-8H89v-10H79v-15h-7V84h13z"/>
+    <path fill="#ffd3a5" d="M93 72h25v8h27v-8h19v13h11v40h-6v14h-9v8h-15v7h-35v-7H95v-8h-9v-14h-6V91h13z"/>
+    <path fill="#e5a06f" d="M72 96h13v27H73v-6h-4v-15h3zM171 96h13v21h-4v6h-9z"/>
+    <path fill="#fff0d6" d="M99 78h21v8H98zM146 78h18v8h-19z"/>
+    <path fill="#bd7b58" d="M126 104h8v17h6v8h-21v-7h7z"/>
+    <path fill="#ffe0bf" d="M129 103h4v17h5v5h-9z"/>
+  </g>
+  <g id="eyes">
+    <path fill="#17110d" d="M98 83h30v7h6v15h-6v7H98v-7h-6V90h6zM149 83h29v7h6v15h-6v7h-29v-7h-6V90h6z"/>
+    <path fill="#fff" d="M107 92h13v13h-13zM157 92h13v13h-13z"/>
+    <path fill="#1b1714" d="M111 95h8v10h-8zM158 95h8v10h-8z"/>
+    <path fill="#fff" d="M113 94h4v4h-4zM160 94h4v4h-4z"/>
+    <path fill="#201711" d="M98 77h30v6H98zM149 77h29v6h-29z"/>
+  </g>
+  <g id="beard">
+    <path fill="#5f554d" opacity=".82" d="M84 122h12v9h8v8h12v7h25v-7h12v-8h9v-9h10v20h-8v11h-14v8h-44v-8H92v-11h-8z"/>
+    <path fill="#342c27" d="M99 132h8v7h-8zM112 143h35v6h-35zM153 132h8v7h-8zM124 154h15v5h-15z"/>
+    <path fill="#8a7568" d="M92 125h8v5h-8zM160 125h8v5h-8zM113 141h34v4h-34z"/>
+  </g>
+  <g id="mouth">
+    <path fill="#211713" d="M105 127h46v7h-7v6h-32v-6h-7z"/>
+    <path fill="#ffd8c0" d="M114 128h28v5h-28z"/>
+  </g>
+</svg>
